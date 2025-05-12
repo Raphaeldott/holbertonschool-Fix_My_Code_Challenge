@@ -9,38 +9,45 @@
  *
  * Return: 1 on success, -1 on failure
  */
- int delete_dnodeint_at_index(dlistint_t **head, unsigned int index)
- {
-     dlistint_t *temp;
-     unsigned int i;
- 
-     if (*head == NULL)
-         return (-1);
- 
-     temp = *head;
- 
-     for (i = 0; temp != NULL && i < index; i++)
-         temp = temp->next;
- 
-     if (temp == NULL)
-         return (-1);
- 
-     if (temp == *head)  /* Deleting the head node */
-     {
-         *head = temp->next;
-         if (*head != NULL)
-             (*head)->prev = NULL;
-     }
-     else if (temp->next == NULL)  /* Deleting the last node */
-     {
-         temp->prev->next = NULL;
-     }
-     else  /* Deleting a middle node */
-     {
-         temp->prev->next = temp->next;
-         temp->next->prev = temp->prev;
-     }
- 
-     free(temp);
-     return (1);
- } 
+int delete_dnodeint_at_index(dlistint_t **head, unsigned int index)
+{
+	dlistint_t *saved_head;
+	dlistint_t *tmp;
+	unsigned int p;
+
+	if (*head == NULL)
+	{
+		return (-1);
+	}
+	saved_head = *head;
+	p = 0;
+	while (p < index && *head != NULL)
+	{
+		*head = (*head)->next;
+		p++;
+	}
+	if (p != index)
+	{
+		*head = saved_head;
+		return (-1);
+	}
+	if (0 == index)
+	{
+		tmp = (*head)->next;
+		free(*head);
+		*head = tmp;
+		if (tmp != NULL)
+		{
+			tmp->prev = NULL;
+		}
+	}
+	else
+	{
+		(*head)->prev->next = (*head)->next;
+		free(*head);
+		if ((*head)->next)
+			(*head)->next->prev = (*head)->prev;
+		*head = saved_head;
+	}
+	return (1);
+}
